@@ -121,8 +121,12 @@ if ($price == 0) {
   updatef %rate, 18.90,             "        priority large box";
 
   updatef %rate, $zones[$zone_ix], "($znam) priority %d lb", $lb;
-  updatef %rate, $box{A}[$zone_ix], "($znam) priority regional A";
-  updatef %rate, $box{B}[$zone_ix], "($znam) priority regional B";
+  if ($lb <= 15) {
+    updatef %rate, $box{A}[$zone_ix], "($znam) priority regional A";
+  }
+  if ($lb <= 20) {
+    updatef %rate, $box{B}[$zone_ix], "($znam) priority regional B";
+  }
 
   foreach my $k (sort {$rate{$a} <=> $rate{$b}} (keys %rate)) {
     printf "%-27.27s \$%6.2f\n", $k, $rate{$k};
