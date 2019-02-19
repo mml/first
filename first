@@ -7,6 +7,7 @@ use POSIX 'ceil';
 
 our $zone;
 our $lb;
+our $dims;
 
 my %box = (
   A => [7.10, 7.25, 7.40, 8.15, 9.47, 10.29, 10.80, 15.33],
@@ -142,7 +143,32 @@ if ($price == 0) {
   printf "$type $oz oz \$%.2f\n", price() / 100;
 }
 
-print "\n8:30AM-5PM M-F, Sat 9-1\n"
+print "\n8:30AM-5PM M-F, Sat 9-1\n";
+
+if ($dims) {
+  my %dim = (
+    'A top' => '7 x 10 x 4-3/4',
+    'A side' => '10-15/16 x 12-13/16 x 2-3/8',
+    'B top' => '10-1/4 x 12 x 5',
+    'B side' => '14-3/8 x 15-7/8 x 2-7/8',
+    'envelope' => '12-1/2 x 9-1/2',
+    'small box' => '5-3/8 x 8-5/8 x 1-5/8',
+    'med box top' => '8-1/2 x 11 x 5-/12',
+    'med box side' => '11-7/8 x 13-5/8 x 3-3/8',
+    'large' => '12 x 12 x 5-1/2',
+  );
+
+  sub bysize($$) {
+    my(@vals) = map {$dim{$_}} @_;
+    foreach (@vals) { s/^(\d+).*/$1/ }
+    return $vals[0] <=> $vals[1];
+  }
+
+  print "\n";
+  foreach my $k (sort bysize keys %dim) {
+    printf "%-20.20s %s\n", $k, $dim{$k};
+  }
+}
 
 #Local,1,2 3 4 5 6 7 8 9
 __DATA__
