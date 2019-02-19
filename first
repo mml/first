@@ -14,6 +14,19 @@ my %box = (
   B => [7.41, 8.42, 9.37, 10.65, 16.15, 18.47, 21.03, 29.15]
 );
 
+# Breaks at 5, 8, and 13 oz.
+my %parcels = (
+  1 => [366, 439, 519, 571],
+  3 => [370, 444, 524, 578],
+  4 => [374, 449, 530, 585],
+  5 => [378, 453, 535, 593],
+  6 => [382, 457, 540, 599],
+  7 => [394, 469, 553, 613],
+  8 => [406, 481, 566, 627],
+);
+$parcels{2} = $parcels{1};
+$parcels{9} = $parcels{8};
+
 if ($#ARGV < 0) {
   print "USAGE: first [-zone ZONE] [parcel|letter|flat|postcard|media] <weight in ounces>\n";
   print "       first -lb [-zone ZONE] [parcel|letter|flat|postcard|media] <weight in lbs>\n";
@@ -40,26 +53,28 @@ sub price() {
     if ($oz > 13 ) {
       return 0;
     } elsif ($oz < 5) {
-      return 350;
+      return $parcels{$zone}[0];
     } elsif ($oz < 8) {
-      return 375;
+      return $parcels{$zone}[1];
+    } elsif ($oz < 13) {
+      return $parcels{$zone}[2];
     } else {
-      return 375 + 35 * ($oz - 8);
+      return $parcels{$zone}[3];
     }
   } elsif ($type eq 'letter') {
     if ($oz > 3.5) {
       $type = 'flat';
       return &price;
     } elsif ($oz == 3.5) {
-      return 113;
+      return 100;
     } else {
-      return 50 + 21 * ($oz - 1);
+      return 55 + 15 * ($oz - 1);
     }
   } elsif ($type eq 'flat') {
     if ($oz > 13) {
       return 0;
     } else {
-      return 100 + 21 * ($oz - 1);
+      return 100 + 15 * ($oz - 1);
     }
   } elsif ($type eq 'postcard') {
     return 35;
@@ -86,12 +101,13 @@ sub updatef(\%$$;@) {
 
 print "[$oz oz $type]\n";
 
+unless (defined $zone) {
+  $zone = 9;
+}
+
+
 my $price = price();
 if ($price == 0) {
-  unless (defined $zone) {
-    $zone = 6;
-  }
-
   my $lb = ceil($oz/16);
 
   ROW: while (<DATA>) {
@@ -114,10 +130,10 @@ if ($price == 0) {
 
   my %rate;
 
-  updatef %rate,  6.70,             "        priority envelope";
-  updatef %rate,  7.20,             "        priority small box";
-  updatef %rate,  7.25,             "        priority padded env";
-  updatef %rate, 13.65,             "        priority medium box";
+  updatef %rate,  7.35,             "        priority envelope";
+  updatef %rate,  7.90,             "        priority small box";
+  updatef %rate,  8.00,             "        priority padded env";
+  updatef %rate, 14.35,             "        priority medium box";
   updatef %rate, 18.90,             "        priority large box";
 
   updatef %rate, $zones[$zone_ix], "($znam) priority %d lb", $lb;
