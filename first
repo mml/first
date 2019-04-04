@@ -151,13 +151,13 @@ if ($price == 0) {
   if (0) {
     printf "($znam) priority %d lb       \$%6.2f\n\n",  $lb, $zones[$zone_ix];
 
-    printf "        priority envelope   \$%6.2f\n",  6.70;
+    printf "        priority envelope   \$%6.2f\n",  7.35;
     printf "($znam) priority regional A \$%6.2f\n",  $box{A}[$zone_ix];
-    printf "        priority small box  \$%6.2f\n",  7.20;
+    printf "        priority small box  \$%6.2f\n",  7.90;
     printf "($znam) priority regional B \$%6.2f\n",  $box{B}[$zone_ix];
-    printf "        priority padded env \$%6.2f\n",  7.25;
-    printf "        priority medium box \$%6.2f\n", 13.65;
-    printf "        priority large box  \$%6.2f\n", 18.90;
+    printf "        priority padded env \$%6.2f\n",  8.05;
+    printf "        priority medium box \$%6.2f\n", 14.35;
+    printf "        priority large box  \$%6.2f\n", 19.95;
   }
 } else {
   printf "$type $oz oz \$%.2f\n", price() / 100;
