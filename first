@@ -14,7 +14,7 @@ my %box = (
   B => [7.41, 8.42, 9.37, 10.65, 16.15, 18.47, 21.03, 29.15]
 );
 
-# Breaks at 5, 8, and 13 oz.
+# Breaks at 5, 9, and 13 oz.
 my %parcels = (
   1 => [366, 439, 519, 571],
   3 => [370, 444, 524, 578],
@@ -54,7 +54,7 @@ sub price() {
       return 0;
     } elsif ($oz < 5) {
       return $parcels{$zone}[0];
-    } elsif ($oz < 8) {
+    } elsif ($oz < 9) {
       return $parcels{$zone}[1];
     } elsif ($oz < 13) {
       return $parcels{$zone}[2];
