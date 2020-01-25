@@ -106,13 +106,15 @@ sub price() {
     if ($oz > 13) {
       return 0;
     } else {
-      return 100 + 15 * ($oz - 1);
+      return 100 + 20 * ($oz - 1);
     }
   } elsif ($type eq 'postcard') {
     return 35;
   } elsif ($type eq 'media') {
     my $lb = ceil($oz / 16);
-    return 266 + 51 * ($lb-1);
+    # NB: The real per-lb rate is somewhere between 53 and 54 ¢/lb, so this
+    # causes slight overpayment.
+    return 280 + 54 * ($lb-1);
   } else {
     die "'$type'?";
   }
