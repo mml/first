@@ -1,5 +1,6 @@
 #!/usr/bin/perl -ws
 # See also http://www.nerdylorrin.net/jerry/postages/index.html
+# and https://pe.usps.com/text/dmm300/Notice123.htm
 
 require 5;
 use strict;
@@ -10,23 +11,25 @@ our $lb;
 our $dims;
 our $zip;
 
+# Discontinued https://about.usps.com/postal-bulletin/2022/pb22613/html/info_006.htm
 my %box = (
   A => [7.65, 7.85, 8.12, 8.76, 10.00, 10.55, 11.20, 15.64],
   B => [8.05, 8.50, 9.40, 10.65, 16.15, 18.47, 21.03, 29.73],
 );
 
+# https://pe.usps.com/text/dmm300/Notice123.htm#_c450
 # Breaks at 5, 9, and 13 oz.
 my %parcels = (
-  1 => [366, 439, 519, 571],
-  3 => [370, 444, 524, 578],
-  4 => [374, 449, 530, 585],
-  5 => [378, 453, 535, 593],
-  6 => [382, 457, 540, 599],
-  7 => [394, 469, 553, 613],
-  8 => [406, 481, 566, 627],
+  1 => [500, 570, 650, 800],
+  2 => [510, 580, 660, 820],
+  3 => [515, 585, 665, 830],
+  4 => [525, 590, 670, 845],
+  5 => [535, 595, 675, 860],
+  6 => [540, 600, 680, 870],
+  7 => [545, 605, 690, 885],
+  8 => [555, 615, 700, 900],
+  9 => [555, 615, 700, 900],
 );
-$parcels{2} = $parcels{1};
-$parcels{9} = $parcels{8};
 
 if ($#ARGV < 0) {
   print "USAGE: first [-zone ZONE] [parcel|letter|flat|postcard|media] <weight in ounces>\n";
@@ -93,28 +96,29 @@ sub price() {
     } else {
       return $parcels{$zone}[3];
     }
+  # https://pe.usps.com/text/dmm300/Notice123.htm#_c037
   } elsif ($type eq 'letter') {
     if ($oz > 3.5) {
       $type = 'flat';
       return &price;
     } elsif ($oz == 3.5) {
-      return 100;
+      return 140;
     } else {
-      return 55 + 15 * ($oz - 1);
+      return 68 + 24 * ($oz - 1);
     }
   } elsif ($type eq 'flat') {
     if ($oz > 13) {
       return 0;
     } else {
-      return 100 + 20 * ($oz - 1);
+      return 139 + 24 * ($oz - 1);
     }
   } elsif ($type eq 'postcard') {
-    return 35;
+    return 53;
   } elsif ($type eq 'media') {
     my $lb = ceil($oz / 16);
-    # NB: The real per-lb rate is somewhere between 53 and 54 ¢/lb, so this
+    # NB: The real per-lb rate is somewhere between 74 and 75 ¢/lb, so this
     # causes slight overpayment.
-    return 280 + 54 * ($lb-1);
+    return 413 + 75 * ($lb-1);
   } else {
     die "'$type'?";
   }
@@ -136,7 +140,7 @@ sub updatef(\%$$;@) {
 print "[$oz oz $type]\n";
 
 unless (defined $zone) {
-  $zone = 9;
+  $zone = 8; # 47404
 }
 
 
@@ -170,11 +174,11 @@ if ($price == 0) {
 
   my %rate;
 
-  updatef %rate,  7.35,             "        priority envelope";
-  updatef %rate,  7.90,             "        priority small box";
-  updatef %rate,  8.00,             "        priority padded env";
-  updatef %rate, 14.35,             "        priority medium box";
-  updatef %rate, 18.90,             "        priority large box";
+  updatef %rate,  9.85,             "        priority envelope";
+  updatef %rate, 10.40,             "        priority small box";
+  updatef %rate, 10.60,             "        priority padded env";
+  updatef %rate, 18.40,             "        priority medium box";
+  updatef %rate, 24.75,             "        priority large box";
 
   updatef %rate, $zones[$zone_ix], "($znam) priority %d lb", $lb;
   if ($lb <= 15) {
@@ -191,13 +195,11 @@ if ($price == 0) {
   if (0) {
     printf "($znam) priority %d lb       \$%6.2f\n\n",  $lb, $zones[$zone_ix];
 
-    printf "        priority envelope   \$%6.2f\n",  7.35;
-    printf "($znam) priority regional A \$%6.2f\n",  $box{A}[$zone_ix];
-    printf "        priority small box  \$%6.2f\n",  7.90;
-    printf "($znam) priority regional B \$%6.2f\n",  $box{B}[$zone_ix];
-    printf "        priority padded env \$%6.2f\n",  8.05;
-    printf "        priority medium box \$%6.2f\n", 14.35;
-    printf "        priority large box  \$%6.2f\n", 19.95;
+    printf "        priority envelope   \$%6.2f\n",  9.85;
+    printf "        priority small box  \$%6.2f\n", 10.40;
+    printf "        priority padded env \$%6.2f\n", 10.65;
+    printf "        priority medium box \$%6.2f\n", 18.40;
+    printf "        priority large box  \$%6.2f\n", 24.75;
   }
 } else {
   printf "$type $oz oz \$%.2f\n", price() / 100;
@@ -207,10 +209,6 @@ print "\n8:30AM-5PM M-F, Sat 9-1\n";
 
 if ($dims) {
   my %dim = (
-    'A top' => '7 x 10 x 4-3/4',
-    'A side' => '10-15/16 x 12-13/16 x 2-3/8',
-    'B top' => '10-1/4 x 12 x 5',
-    'B side' => '14-3/8 x 15-7/8 x 2-7/8',
     'envelope' => '12-1/2 x 9-1/2',
     'small box' => '5-3/8 x 8-5/8 x 1-5/8',
     'med box top' => '8-1/2 x 11 x 5-/12',
